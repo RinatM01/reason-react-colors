@@ -9,32 +9,27 @@ module Style = {
   |}];
 };
 
-// module Color = {
-//   type t = {
-//     name: string,
-//     [@mel.as "color"]
-//     code: string,
-//   };
-// };
-
-// type t = {
-//   [@mel.as "paletteName"]
-//   name: string,
-//   id: string,
-//   emoji: string,
-//   colors: array(Color.t),
-// };
-
 [@react.component]
-let make = (~palette: ColorUtility.pallete) => {
-  let newPal = ColorUtility.generatePalettes(palette);
-  Js.log(newPal);
+let make = (~palette: ColorUtility.extendedPalette) => {
+  let (lightLevel, setLightLevel) = React.useState(_ => 400);
+  let (format, setFormat) = React.useState(_ => ColorUtility.HexFormat);
+
+  let currColors =
+    palette.colors |> Array.map(colorArrays => colorArrays[lightLevel / 100]);
+
+  //Js.log(currColors[0].rgba |> ColorUtility.toRgba);
   <div className=Style.palette>
+    <Navbar lightLevel setLightLevel format setFormat />
     <div className=Style.paletteColors>
-      {palette.colors
-       |> Array.map((color: ColorUtility.color) =>
-            <ColorBox key={color.code} code={color.code} name={color.name} />
-          )
+      {currColors
+       |> Array.map((color: ColorUtility.exntededColor) => {
+            let code = ColorUtility.getCorrectFormat(color, format);
+            switch (code) {
+            | None => React.null
+            | Some(code) =>
+              <ColorBox key={color.name} code name={color.name} />
+            };
+          })
        |> React.array}
     </div>
   </div>;

@@ -4,6 +4,6 @@ external seedPalettes: array(ColorUtility.pallete) = "default";
 [@react.component]
 let make = () => {
   //Js.log(seedPalettes[0]);
-  let material = seedPalettes[3];
+  let material = ColorUtility.generatePalettes(seedPalettes[0]);
   <Palette palette=material />;
 };

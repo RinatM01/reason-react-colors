@@ -21,11 +21,10 @@ module Style = {
   |}
   ];
   let colorBox = color => {
-    let hexy = color |> Js.String.slice(~start=1) |> CssJs.hex;
-
+    let cssColor = ColorUtility.toCss(color);
     [%cx
      {j|
-        background-color: $(hexy);
+        background-color: $(cssColor);
         width: 20%;
         height: 25%;
         display: inline-block;
@@ -66,10 +65,11 @@ module Style = {
   |}
   ];
   let copyOverlay = color => {
-    let hexy = color |> Js.String.slice(~start=1) |> CssJs.hex;
+    let cssColor = ColorUtility.toCss(color);
+
     [%cx
      {j|
-    background-color: $(hexy);
+    background-color: $(cssColor);
     opacity:0;
     z-index: 0;
     width: 100%;
@@ -136,13 +136,12 @@ module Style = {
 [@react.component]
 let make = (~code, ~name) => {
   let (copied, setCopied) = React.useState(_ => false);
+  let copyText = ColorUtility.toString(code);
   let toggleCopyState = () => {
     setCopied(_ => true);
     Js.Global.setTimeout(~f=_ => setCopied(_ => false), 800) |> ignore;
   };
-  // let hexy = code |> ColorUtility.generateScale(_, 5);
-  // Js.log(hexy);
-  <CopyToClipBoard text=code onCopy=toggleCopyState>
+  <CopyToClipBoard text=copyText onCopy=toggleCopyState>
     <div className={Style.colorBox(code)}>
       <div
         className={
@@ -152,7 +151,7 @@ let make = (~code, ~name) => {
       <div
         className={(copied ? Style.showCopyMsg : "") ++ " " ++ Style.copyMsg}>
         <h1> {RR.s("copied!")} </h1>
-        <p> {RR.s(code)} </p>
+        <p> {RR.s(copyText)} </p>
       </div>
       <div>
         <div className=Style.boxContent> <span> {RR.s(name)} </span> </div>
